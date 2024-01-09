@@ -1,8 +1,10 @@
 package main
 
 import (
-	lexer "github.com/whirl-lang/whirl/pkg/lexer"
+	"fmt"
 	"os"
+
+	lexer "github.com/whirl-lang/whirl/pkg/lexer"
 )
 
 func main() {
@@ -16,14 +18,36 @@ func main() {
 	filename := args[1]
 
 	file, err := os.Open(filename)
-	check(err)
+	if err != nil {
+		panic(err)
+	}
 	
 	stat, err := file.Stat()
-	check(err)
+	if err != nil {
+		panic(err)
+	}
 
-	bytes = make([]byte, stat.Size())
-	count, err := file.Read(bytes)
-	check(err)
+	bytes := make([]byte, stat.Size())
+	file.Read(bytes)
+	
+	tokens := lexer.Iterator(bytes)
 
-	lexer.Tokenize(bytes)
+	t, err := tokens.Next()
+	
+	if err != nil {
+		panic(err)
+	}
+	
+	for t.Kind != lexer.UNKNOWN {
+		fmt.Println(t)
+		t, err = tokens.Next()
+
+		if err != nil {
+			panic(err)
+		}
+		
+	}
+	fmt.Println(t)
+
+
 }

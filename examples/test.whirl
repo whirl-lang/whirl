@@ -4,8 +4,7 @@ struct Test {
 }
 
 proc main() :: int {
-
-    | this is a comment |
+ 
     let c: int[] = [1, 2, 3, 4];
     let b: int = test_loops(c);
     
@@ -15,13 +14,14 @@ proc main() :: int {
 }
 
 proc test_structs() :: void { 
-
-    | Testing the structs |
+ 
     let a: Test = {
         a: 5,
         b: "Test"
     }
+    
     println(a.a);
+
 
 }
 
@@ -29,7 +29,7 @@ proc test_loops(arr: int[]) :: int {
 
     let a: int = 5;
 
-    until a > 10 {
+     a > 10 {
         a = a + 1;
     }
 
@@ -38,6 +38,7 @@ proc test_loops(arr: int[]) :: int {
             escape 5;
         }
     }
+
 
     escape -1;
 }
