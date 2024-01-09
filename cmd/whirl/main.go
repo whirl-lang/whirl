@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	lexer "github.com/whirl-lang/whirl/pkg/lexer"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	lexer.Tokenize("if (x == 1) { print(x); }")
 }
