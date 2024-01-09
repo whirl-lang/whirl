@@ -54,8 +54,9 @@ const (
 	STRING
 	BOOLEAN
 	CHAR
+	VOID
 )
 
-func Tokenize(input string) []Token {
+func Tokenize(input []byte) []Token {
 	return []Token{ Token{ kind: EOF, value: "" } }
 }
