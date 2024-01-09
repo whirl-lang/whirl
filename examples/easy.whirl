@@ -1,1 +1,4 @@
-let abc = b;
+proc main() :: int {
+    let a: int = 5;
+    escape a;
+}

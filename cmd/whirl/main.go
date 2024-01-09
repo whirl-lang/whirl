@@ -21,7 +21,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	
+
 	stat, err := file.Stat()
 	if err != nil {
 		panic(err)
@@ -29,25 +29,24 @@ func main() {
 
 	bytes := make([]byte, stat.Size())
 	file.Read(bytes)
-	
+
 	tokens := lexer.Iterator(bytes)
 
 	t, err := tokens.Next()
-	
+	fmt.Println(t)
 	if err != nil {
 		panic(err)
 	}
-	
-	for t.Kind != lexer.UNKNOWN {
-		fmt.Println(t)
+
+	for t.Kind != lexer.EOF {
+
 		t, err = tokens.Next()
 
 		if err != nil {
 			panic(err)
 		}
-		
-	}
-	fmt.Println(t)
+		fmt.Println(t)
 
+	}
 
 }

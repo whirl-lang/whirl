@@ -2,28 +2,27 @@ package lexer
 
 import (
 	"bytes"
-	"errors"
-	"fmt"
 )
 
 type TokenIterator struct {
-	bytes []byte
+	Bytes []byte
 }
 
 func (iter *TokenIterator) Next() (Token, error) {
-	fmt.Println(string(iter.bytes))
-	if len(iter.bytes) == 0 {
-		
-		return Token{UNKNOWN, ""}, nil
+	//fmt.Println(string(iter.Bytes))
+	if len(iter.Bytes) == 0 {
+		//fmt.Println("0")
+		return Token{EOF, ""}, nil
 	}
 
 	//skip whitespace
-	for iter.bytes[0] == ' ' || iter.bytes[0] == '\n' || iter.bytes[0] == '\t' {
-		iter.bytes = iter.bytes[1:]
-		
-		if len(iter.bytes) == 0 {
-			
-			return Token{UNKNOWN, ""}, nil
+	for iter.Bytes[0] == ' ' || iter.Bytes[0] == '\n' || iter.Bytes[0] == '\t' || iter.Bytes[0] == '\r' {
+		//fmt.Println("skipping whitespace")
+		iter.Bytes = iter.Bytes[1:]
+
+		if len(iter.Bytes) == 0 {
+			//fmt.Println("1")
+			return Token{EOF, ""}, nil
 		}
 	}
 
@@ -31,36 +30,103 @@ func (iter *TokenIterator) Next() (Token, error) {
 	//keywords must have a space, tab or newline after them
 	for i := IF; i <= STRUCT; i++ {
 		word := TokensWithSpace[i]
-		
-		if bytes.HasPrefix(iter.bytes, word) {
-			length := len(word)
 
-			if length >= len(iter.bytes) || iter.bytes[length] == ' ' || iter.bytes[length] == '\n' || iter.bytes[length] == '\t' {
-				iter.bytes = iter.bytes[length:]
-				
-				return Token{i, ""}, nil
-			}
+		if iter.FoundToken(word, true) {
+
+			//fmt.Println("2")
+			return Token{i, "Stringified: " + string(word) + " "}, nil
 		}
+
 	}
 
 	//check for the rest
 	for i := EQ; i <= STRING; i++ {
 		word := TokensWithoutSpace[i]
 
-		if bytes.HasPrefix(iter.bytes, word) {
-			iter.bytes = iter.bytes[len(word):]
-			
-			
-			return Token{i, ""}, nil
+		if iter.FoundToken(word, false) {
+			//fmt.Println("3")
+			return Token{i, "Stringified: " + string(word) + " "}, nil
 		}
 	}
 
-	//check for identifiers and literals
-	
+	//Check for booleans
+	if iter.FoundToken([]byte("false"), true) {
+		return Token{BOOLEAN_LIT, "false"}, nil
+	}
 
-	
-	
-	return Token{}, errors.New("unknown token")
+	if iter.FoundToken([]byte("true"), true) {
+		return Token{BOOLEAN_LIT, "true"}, nil
+	}
+
+	//Check for strings
+	if iter.Bytes[0] == '"' {
+		iter.Bytes = iter.Bytes[1:]
+		var str []byte
+
+		for iter.Bytes[0] != '"' {
+			str = append(str, iter.Bytes[0])
+			iter.Bytes = iter.Bytes[1:]
+		}
+
+		iter.Bytes = iter.Bytes[1:]
+
+		return Token{STRING_LIT, string(str)}, nil
+	}
+
+	//check for char
+	if iter.Bytes[0] == '\'' {
+
+		if len(iter.Bytes) >= 3 && iter.Bytes[2] == '\'' {
+			iter.Bytes = iter.Bytes[1:]
+			byte := iter.Bytes[0]
+			iter.Bytes = iter.Bytes[2:]
+			return Token{CHAR_LIT, string(byte)}, nil
+		}
+	}
+
+	//check for int
+	if iter.Bytes[0] >= '0' && iter.Bytes[0] <= '9' {
+		length := 0
+
+		for iter.Bytes[length] >= '0' && iter.Bytes[length] <= '9' {
+			length++
+		}
+
+		num := iter.Bytes[:length]
+		iter.Bytes = iter.Bytes[length:]
+		return Token{INT_LIT, string(num)}, nil
+	}
+
+	//check for identifier
+	index := 0
+
+	for (iter.Bytes[index] >= 'a' && iter.Bytes[index] <= 'z') || (iter.Bytes[index] >= 'A' && iter.Bytes[index] <= 'Z') || iter.Bytes[index] == '_' {
+		index++
+	}
+	str := iter.Bytes[:index]
+	iter.Bytes = iter.Bytes[index:]
+	return Token{IDENT, string(str)}, nil
+
+}
+
+func (iter *TokenIterator) FoundToken(token []byte, seperation bool) bool {
+	length := len(token)
+	hasPrefix := bytes.HasPrefix(iter.Bytes, token)
+
+	if seperation && len(iter.Bytes) > length && !IsSeperationByte(iter.Bytes[length]) {
+		return false
+	}
+
+	if hasPrefix && len(iter.Bytes) >= length {
+		iter.Bytes = iter.Bytes[length:]
+	}
+
+	return hasPrefix
+
+}
+
+func IsSeperationByte(b byte) bool {
+	return b == ' ' || b == '\n' || b == '\t' || b == '\r' || b == '*' || b == '/' || b == '%' || b == '+' || b == '-' || b == '(' || b == ')' || b == '{' || b == '}' || b == ',' || b == ';' || b == ':' || b == '=' || b == '!' || b == '<' || b == '>'
 }
 
 var TokensWithSpace = [][]byte{
@@ -175,8 +241,7 @@ const (
 	BOOLEAN_LIT
 	CHAR_LIT
 
-	UNKNOWN
-	
+	EOF
 )
 
 func Iterator(input []byte) TokenIterator {
