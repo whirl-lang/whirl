@@ -12,6 +12,7 @@ const (
 	COMMA
 	SEMICOLON
 	ASSIGN // this is = while EQ is ==
+	IDENT
 
 	//Keywords
 	IF
