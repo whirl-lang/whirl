@@ -56,7 +56,7 @@ func (iter *TokenIterator) Next() (Token, error) {
 		if iter.FoundToken(word, true) {
 
 			//fmt.Println("2")
-			return Token{i, "Stringified: " + string(word) + " "}, nil
+			return Token{i, string(word)}, nil
 		}
 
 	}
@@ -67,7 +67,7 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 		if iter.FoundToken(word, false) {
 			//fmt.Println("3")
-			return Token{i, "Stringified: " + string(word) + " "}, nil
+			return Token{i, string(word)}, nil
 		}
 	}
 
@@ -97,12 +97,11 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 	//check for char
 	if iter.Bytes[0] == '\'' {
-
 		if len(iter.Bytes) >= 3 && iter.Bytes[2] == '\'' {
-			iter.Bytes = iter.Bytes[1:]
-			byte := iter.Bytes[0]
-			iter.Bytes = iter.Bytes[2:]
-			return Token{CHAR_LIT, string(byte)}, nil
+			char := iter.Bytes[1]
+			iter.Bytes = iter.Bytes[3:]
+
+			return Token{CHAR_LIT, string(char)}, nil
 		}
 	}
 

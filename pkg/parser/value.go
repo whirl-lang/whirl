@@ -109,15 +109,17 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 	counter := 0
 	expr := codegen.ExprMath{}
 
-	// capture until open parens equal closed parens
-	// and the next token isn't a closeable one
-	for !next.IsSeparator() {
-		if next.Kind == lexer.CURLYOPEN {
+	for {
+		if next.Kind == lexer.PARENOPEN {
 			counter++
 		}
 
-		if next.Kind == lexer.CURLYCLOSE {
+		if next.Kind == lexer.PARENCLOSE {
 			counter--
+		}
+
+		if next.IsSeparator() && counter == 0 && next.Kind != lexer.PARENCLOSE {
+			break
 		}
 
 		if counter < 0 {
@@ -136,6 +138,10 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 
 		if err != nil {
 			return expr, err
+		}
+
+		if next.Kind == lexer.PARENCLOSE && counter == 0 {
+			break
 		}
 	}
 

@@ -11,7 +11,6 @@ import (
 )
 
 func main() {
-
 	args := os.Args
 
 	if len(args) != 2 {
@@ -19,7 +18,6 @@ func main() {
 	}
 
 	filename := args[1]
-
 	file, err := os.Open(filename)
 
 	if err != nil {
@@ -38,7 +36,13 @@ func main() {
 	tokens := lexer.Iterator(bytes)
 	nodes := parser.Iterator(tokens)
 
-	codegen.Generate(&nodes)
+	file, err = os.Create("out.c")
+
+	if err != nil {
+		panic(err)
+	}
+
+	codegen.Generate(&nodes, file)
 
 	out, err := exec.Command("tcc", "-run", "out.c").Output()
 

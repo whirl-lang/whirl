@@ -1,16 +1,18 @@
 package codegen
 
 import (
-	"os"
+	"bufio"
+	"io"
 )
 
 type InstructionIterator interface {
 	Next() (Instruction, error)
 }
 
-func Generate(nodes InstructionIterator) {
+func Generate(nodes InstructionIterator, out io.Writer) {
+	writer := bufio.NewWriter(out)
 
-	output := []byte{}
+	defer writer.Flush()
 
 	for {
 		node, err := nodes.Next()
@@ -23,57 +25,6 @@ func Generate(nodes InstructionIterator) {
 			break
 		}
 
-		output = append(output, generateCode(node)...)
-
+		writer.WriteString(node.CInstruction())
 	}
-
-	file, err := os.Create("out.c")
-
-	if err != nil {
-		panic(err)
-	}
-
-	defer file.Close()
-
-	file.Write(output)
-
-}
-
-func generateCode(node Instruction) []byte {
-	out := []byte{}
-	switch node := node.(type) {
-	case Procedure:
-		out = append(out, []byte(node.ReturnType.CType())...)
-		out = append(out, []byte(" ")...)
-		out = append(out, []byte(node.Ident)...)
-		out = append(out, []byte("(")...)
-		//args
-
-		for i, arg := range node.Args {
-			out = append(out, []byte(arg.Type.CType())...)
-			out = append(out, []byte(" ")...)
-			out = append(out, []byte(arg.Ident)...)
-			if i < len(node.Args)-1 {
-				out = append(out, []byte(", ")...)
-			}
-		}
-
-		out = append(out, []byte(")")...)
-		out = append(out, []byte(" {\n")...)
-		//body
-
-		for _, instruction := range node.Instructions {
-			out = append(out, generateCode(instruction)...)
-		}
-
-		out = append(out, []byte("}\n\n")...)
-	case Escape:
-		out = append(out, []byte("\treturn")...)
-		out = append(out, []byte(" ")...)
-		out = append(out, []byte("0")...)
-		out = append(out, []byte(";\n")...)
-	}
-
-	return out
-
 }
