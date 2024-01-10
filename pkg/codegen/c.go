@@ -236,6 +236,14 @@ func (r Reassign) CInstruction() string {
 	return fmt.Sprintf("%s = %s;", r.Ident, r.Expr.(Value).CValue())
 }
 
+func (b Break) CInstruction() string {
+	return "break;"
+}
+
+func (c Continue) CInstruction() string {
+	return "continue;"
+}
+
 func (i Iter) CInstruction() string {
 	var buffer bytes.Buffer
 

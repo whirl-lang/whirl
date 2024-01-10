@@ -335,6 +335,46 @@ func ParseIter(tokens *lexer.TokenIterator) (codegen.Iter, error) {
 	return codegen.Iter{Ident: ident.Name, Lower: lower, Upper: upper, Body: body}, nil
 }
 
+func ParseBreak(tokens *lexer.TokenIterator) (codegen.Break, error) {
+
+	// get "break"
+	_, err := ExpectToken(tokens, lexer.BREAK)
+
+	if err != nil {
+		return codegen.Break{}, err
+	}
+
+	// get semi
+	_, err = ExpectToken(tokens, lexer.SEMICOLON)
+
+	if err != nil {
+		return codegen.Break{}, err
+	}
+
+	return codegen.Break{}, nil
+
+}
+
+func ParseContinue(tokens *lexer.TokenIterator) (codegen.Continue, error) {
+
+	// get "continue"
+	_, err := ExpectToken(tokens, lexer.CONTINUE)
+
+	if err != nil {
+		return codegen.Continue{}, err
+	}
+
+	// get semi
+	_, err = ExpectToken(tokens, lexer.SEMICOLON)
+
+	if err != nil {
+		return codegen.Continue{}, err
+	}
+
+	return codegen.Continue{}, nil
+
+}
+
 func ParseArgs(tokens *lexer.TokenIterator) ([]codegen.Argument, error) {
 	var args []codegen.Argument
 	next, err := tokens.Peek()

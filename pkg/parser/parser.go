@@ -58,6 +58,10 @@ func ParseInstruction(tokens *lexer.TokenIterator) (codegen.Instruction, error) 
 	switch next.Kind {
 	case lexer.LET:
 		return ParseAssignment(tokens)
+	case lexer.BREAK:
+		return ParseBreak(tokens)
+	case lexer.CONTINUE:
+		return ParseContinue(tokens)
 	case lexer.STRUCT:
 		return ParseStruct(tokens)
 	case lexer.IF:

@@ -1,8 +1,10 @@
 proc main() :: int {
 	
+    let s: string[] = ["Hello", "a", "b"];
 
-    iter i in 1:6+4 {
-        printf("%d", i);
+    iter i in 0:3 {
+        printf("%s\n", s[i]);
+        break;
     }
 
 	escape 0;

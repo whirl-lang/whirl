@@ -127,3 +127,7 @@ type Reassign struct {
 	Ident string
 	Expr  Expr
 }
+
+type Break struct{}
+
+type Continue struct{}
