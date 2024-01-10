@@ -62,6 +62,28 @@ func (i Ident) CType() string {
 	return i.Name
 }
 
+func (a Array) CType() string {
+	return a.Type.CType() + "[]"
+}
+
+func (a Array) CValue() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString("{")
+
+	for i, value := range a.Value {
+		buffer.WriteString(value.(Value).CValue())
+
+		if i != len(a.Value)-1 {
+			buffer.WriteString(", ")
+		}
+	}
+
+	buffer.WriteString("}")
+
+	return buffer.String()
+}
+
 func (p Procedure) CInstruction() string {
 	var buffer bytes.Buffer
 
@@ -182,10 +204,14 @@ func (e ExprMath) CValue() string {
 	var buffer bytes.Buffer
 
 	for _, token := range e.Tokens {
-		buffer.WriteString(token.Value)
+		buffer.WriteString(token.CValue())
 	}
 
 	return buffer.String()
+}
+
+func (e ExprToken) CValue() string {
+	return e.Token.Value
 }
 
 func (p ProcedureCall) CValue() string {

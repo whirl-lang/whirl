@@ -57,10 +57,16 @@ type If struct {
 	Else      []Instruction
 }
 
-type Expr interface{}
+type Expr interface {
+	CValue() string
+}
 
 type ExprMath struct {
-	Tokens []lexer.Token
+	Tokens []Expr
+}
+
+type ExprToken struct {
+	Token lexer.Token
 }
 
 type Assignment struct {
@@ -76,6 +82,11 @@ type FunctionCall struct {
 
 type Escape struct {
 	Expr Expr
+}
+
+type Array struct {
+	Type  Type
+	Value []Expr
 }
 
 type Int struct {
@@ -98,4 +109,16 @@ type Char struct {
 
 type Ident struct {
 	Name string
+}
+
+type Iter struct {
+	Ident string
+	Lower Expr
+	Upper Expr
+	Body  []Instruction
+}
+
+type Until struct {
+	Condition Expr
+	Body      []Instruction
 }

@@ -31,19 +31,14 @@ func (iter *TokenIterator) Next() (Token, error) {
 		return token, nil
 	}
 
-	//fmt.Println(string(iter.Bytes))
 	if len(iter.Bytes) == 0 {
-		//fmt.Println("0")
 		return Token{EOF, ""}, nil
 	}
 
-	//skip whitespace
 	for iter.Bytes[0] == ' ' || iter.Bytes[0] == '\n' || iter.Bytes[0] == '\t' || iter.Bytes[0] == '\r' {
-		//fmt.Println("skipping whitespace")
 		iter.Bytes = iter.Bytes[1:]
 
 		if len(iter.Bytes) == 0 {
-			//fmt.Println("1")
 			return Token{EOF, ""}, nil
 		}
 	}
@@ -177,10 +172,12 @@ var TokensWithoutSpace = [][]byte{
 	SEMICOLON: []byte(";"),
 	ASSIGN:    []byte("="),
 
-	PARENOPEN:  []byte("("),
-	PARENCLOSE: []byte(")"),
-	CURLYOPEN:  []byte("{"),
-	CURLYCLOSE: []byte("}"),
+	PARENOPEN:    []byte("("),
+	PARENCLOSE:   []byte(")"),
+	CURLYOPEN:    []byte("{"),
+	CURLYCLOSE:   []byte("}"),
+	BRACKETOPEN:  []byte("["),
+	BRACKETCLOSE: []byte("]"),
 
 	PLUS:  []byte("+"),
 	MINUS: []byte("-"),
@@ -201,7 +198,7 @@ type Token struct {
 }
 
 func (t Token) IsSeparator() bool {
-	return (t.Kind >= COLON && t.Kind <= CURLYCLOSE) || (t.Kind >= IF && t.Kind <= STRUCT)
+	return (t.Kind >= COLON && t.Kind <= BRACKETCLOSE) || (t.Kind >= IF && t.Kind <= STRUCT)
 }
 
 var TokensPretty = []string{
@@ -231,10 +228,12 @@ var TokensPretty = []string{
 	SEMICOLON: ";",
 	ASSIGN:    "=",
 
-	PARENOPEN:  "(",
-	PARENCLOSE: ")",
-	CURLYOPEN:  "{",
-	CURLYCLOSE: "}",
+	PARENOPEN:    "(",
+	PARENCLOSE:   ")",
+	CURLYOPEN:    "{",
+	CURLYCLOSE:   "}",
+	BRACKETOPEN:  "[",
+	BRACKETCLOSE: "]",
 
 	PLUS:  "+",
 	MINUS: "-",
@@ -293,6 +292,8 @@ const (
 	PARENCLOSE
 	CURLYOPEN
 	CURLYCLOSE
+	BRACKETOPEN
+	BRACKETCLOSE
 
 	//Arithmetic
 	PLUS

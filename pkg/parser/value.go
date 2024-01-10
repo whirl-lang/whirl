@@ -99,11 +99,73 @@ func ParseInitField(tokens *lexer.TokenIterator) (codegen.FieldInit, error) {
 	return codegen.FieldInit{Ident: ident.Name, Expr: expr}, nil
 }
 
+func ParseArray(tokens *lexer.TokenIterator) (codegen.Array, error) {
+	_, err := ExpectToken(tokens, lexer.BRACKETOPEN)
+
+	if err != nil {
+		return codegen.Array{}, err
+	}
+
+	next, err := tokens.Peek()
+
+	if err != nil {
+		return codegen.Array{}, err
+	}
+
+	var elements []codegen.Expr
+
+	for next.Kind != lexer.BRACKETCLOSE {
+		expr, err := ParseExpr(tokens)
+
+		if err != nil {
+			return codegen.Array{}, err
+		}
+
+		elements = append(elements, expr)
+
+		next, err = tokens.Peek()
+
+		if err != nil {
+			return codegen.Array{}, err
+		}
+
+		if next.Kind == lexer.COMMA {
+			_, err = ExpectToken(tokens, lexer.COMMA)
+
+			if err != nil {
+				return codegen.Array{}, err
+			}
+
+			next, err = tokens.Peek()
+
+			if err != nil {
+				return codegen.Array{}, err
+			}
+		}
+
+		if next.Kind == lexer.BRACKETCLOSE {
+			break
+		}
+	}
+
+	_, err = ExpectToken(tokens, lexer.BRACKETCLOSE)
+
+	if err != nil {
+		return codegen.Array{}, err
+	}
+
+	return codegen.Array{Value: elements}, nil
+}
+
 func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 	next, err := tokens.Peek()
 
 	if err != nil {
 		return codegen.ExprMath{}, err
+	}
+
+	if next.Kind == lexer.BRACKETOPEN {
+		return ParseArray(tokens)
 	}
 
 	counter := 0
@@ -132,7 +194,42 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 			return expr, err
 		}
 
-		expr.Tokens = append(expr.Tokens, token)
+		expr.Tokens = append(expr.Tokens, codegen.ExprToken{Token: token})
+
+		// check for array access
+		next, err = tokens.Peek()
+
+		if err != nil {
+			return expr, err
+		}
+
+		for next.Kind == lexer.BRACKETOPEN {
+			open, err := ExpectToken(tokens, lexer.BRACKETOPEN)
+
+			if err != nil {
+				return expr, err
+			}
+
+			index, err := ParseExpr(tokens)
+
+			if err != nil {
+				return expr, err
+			}
+
+			close, err := ExpectToken(tokens, lexer.BRACKETCLOSE)
+
+			if err != nil {
+				return expr, err
+			}
+
+			next, err = tokens.Peek()
+
+			if err != nil {
+				return expr, err
+			}
+
+			expr.Tokens = append(expr.Tokens, codegen.ExprToken{Token: open}, index, codegen.ExprToken{Token: close})
+		}
 
 		next, err = tokens.Peek()
 

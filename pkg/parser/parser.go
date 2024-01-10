@@ -98,22 +98,54 @@ func ParseType(tokens *lexer.TokenIterator) (codegen.Type, error) {
 		return nil, err
 	}
 
+	var typ codegen.Type
+
 	switch tok.Kind {
 	case lexer.INT:
-		return codegen.Int{}, nil
+		typ = codegen.Int{}
 	case lexer.STRING:
-		return codegen.String{}, nil
+		typ = codegen.String{}
 	case lexer.BOOLEAN:
-		return codegen.Bool{}, nil
+		typ = codegen.Bool{}
 	case lexer.CHAR:
-		return codegen.Char{}, nil
+		typ = codegen.Char{}
 	case lexer.VOID:
-		return codegen.Void{}, nil
+		typ = codegen.Void{}
 	case lexer.IDENT:
-		return codegen.Ident{Name: tok.Value}, nil
+		typ = codegen.Ident{Name: tok.Value}
+	default:
+		return nil, fmt.Errorf("unexpected token %s", lexer.TokensPretty[tok.Kind])
 	}
 
-	return nil, fmt.Errorf("unexpected token %s", lexer.TokensPretty[tok.Kind])
+	tok, err = tokens.Peek()
+
+	if err != nil {
+		return nil, err
+	}
+
+	for tok.Kind == lexer.BRACKETOPEN {
+		_, err = ExpectToken(tokens, lexer.BRACKETOPEN)
+
+		if err != nil {
+			return nil, err
+		}
+
+		_, err = ExpectToken(tokens, lexer.BRACKETCLOSE)
+
+		if err != nil {
+			return nil, err
+		}
+
+		typ = codegen.Array{Type: typ}
+
+		tok, err = tokens.Peek()
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return typ, nil
 }
 
 func ParseIdent(tokens *lexer.TokenIterator) (codegen.Ident, error) {
