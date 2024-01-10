@@ -1,4 +1,4 @@
-proc main() :: int {
+proc main(a: int, b: string) :: int {
     let a: int = 5;
     escape a;
 }
