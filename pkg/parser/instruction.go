@@ -197,6 +197,7 @@ func ParseProcedure(tokens *lexer.TokenIterator) (codegen.Procedure, error) {
 	returnType, err := ParseType(tokens)
 
 	if err != nil {
+
 		return codegen.Procedure{}, err
 	}
 

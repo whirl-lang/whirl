@@ -8,14 +8,9 @@ import (
 )
 
 func ParseBody(tokens *lexer.TokenIterator) ([]codegen.Instruction, error) {
-	next, err := tokens.Peek()
-
-	if err != nil {
-		return nil, err
-	}
 
 	// parse curly open
-	_, err = ExpectToken(tokens, lexer.CURLYOPEN)
+	_, err := ExpectToken(tokens, lexer.CURLYOPEN)
 
 	if err != nil {
 		// parse one instruction
@@ -29,6 +24,12 @@ func ParseBody(tokens *lexer.TokenIterator) ([]codegen.Instruction, error) {
 	}
 
 	var instructions []codegen.Instruction
+
+	next, err := tokens.Peek()
+
+	if err != nil {
+		return nil, err
+	}
 
 	for next.Kind != lexer.CURLYCLOSE {
 		instruction, err := ParseInstruction(tokens)
@@ -120,7 +121,7 @@ func ParseInstruction(tokens *lexer.TokenIterator) (codegen.Instruction, error) 
 
 func ParseType(tokens *lexer.TokenIterator) (codegen.Type, error) {
 	tok, err := tokens.Next()
-
+	//fmt.Println(tok)
 	if err != nil {
 		return nil, err
 	}
@@ -154,12 +155,14 @@ func ParseType(tokens *lexer.TokenIterator) (codegen.Type, error) {
 		_, err = ExpectToken(tokens, lexer.BRACKETOPEN)
 
 		if err != nil {
+
 			return nil, err
 		}
 
 		_, err = ExpectToken(tokens, lexer.BRACKETCLOSE)
 
 		if err != nil {
+
 			return nil, err
 		}
 
