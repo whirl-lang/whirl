@@ -123,7 +123,7 @@ func ParseType(tokens *lexer.TokenIterator) (codegen.Type, error) {
 		return nil, err
 	}
 
-	for tok.Kind == lexer.BRACKETOPEN {
+	if tok.Kind == lexer.BRACKETOPEN {
 		_, err = ExpectToken(tokens, lexer.BRACKETOPEN)
 
 		if err != nil {
@@ -137,12 +137,6 @@ func ParseType(tokens *lexer.TokenIterator) (codegen.Type, error) {
 		}
 
 		typ = codegen.Array{Type: typ}
-
-		tok, err = tokens.Peek()
-
-		if err != nil {
-			return nil, err
-		}
 	}
 
 	return typ, nil

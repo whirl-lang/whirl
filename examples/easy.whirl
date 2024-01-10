@@ -1,13 +1,10 @@
-
-
 proc main() :: int {
-    let b: int[] = [1, 2, 3];
+	let b: int[] = [1, 2, 3];
 	printf("%d", add(b[0], b[2]));
 
 	escape 0;
 }
 
-
 proc add(a: int, b: int) :: int {
-    escape a + b;
+	escape a + b;
 }

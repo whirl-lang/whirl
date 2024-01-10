@@ -173,8 +173,6 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 			counter--
 		}
 
-		//fmt.Println("next:", next, "counter:", counter, "is sep:", next.IsSeparator())
-
 		if next.IsSeparator() && counter == 0 && next.Kind != lexer.PARENCLOSE {
 			break
 		}
@@ -198,7 +196,7 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 			return expr, err
 		}
 
-		for next.Kind == lexer.BRACKETOPEN {
+		if next.Kind == lexer.BRACKETOPEN {
 			open, err := ExpectToken(tokens, lexer.BRACKETOPEN)
 
 			if err != nil {
@@ -212,12 +210,6 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 			}
 
 			close, err := ExpectToken(tokens, lexer.BRACKETCLOSE)
-
-			if err != nil {
-				return expr, err
-			}
-
-			next, err = tokens.Peek()
 
 			if err != nil {
 				return expr, err
