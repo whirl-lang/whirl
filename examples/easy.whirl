@@ -1,15 +1,13 @@
-struct Test {
-	a: int,
-	b: string,
-}
+
 
 proc main() :: int {
-	let t: Test = Test {
-		a: 0,
-		b: "hello world",
-	};
-
-	printf("%s", t.b);
+    let b: int[] = [1, 2, 3];
+	printf("%d", add(b[0], b[2]));
 
 	escape 0;
+}
+
+
+proc add(a: int, b: int) :: int {
+    escape a + b;
 }

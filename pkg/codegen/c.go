@@ -63,7 +63,17 @@ func (i Ident) CType() string {
 }
 
 func (a Array) CType() string {
-	return a.Type.CType() + "[]"
+	return a.Type.CType()
+}
+
+func (a Array) Brackets() string {
+	switch a.Type.(type) {
+	case Array:
+		//incase we somehow ever need 2d array (bad we need Vec)
+		return "[]" + a.Type.(Array).Brackets()
+	}
+
+	return "[]"
 }
 
 func (a Array) CValue() string {
@@ -121,14 +131,12 @@ func (s Struct) CType() string {
 	buffer.WriteString(s.Ident)
 	buffer.WriteString(" { ")
 
-	for i, field := range s.Fields {
+	for _, field := range s.Fields {
 		buffer.WriteString(field.Type.CType())
 		buffer.WriteString(" ")
 		buffer.WriteString(field.Ident)
 
-		if i != len(s.Fields)-1 {
-			buffer.WriteString(", ")
-		}
+		buffer.WriteString("; ")
 	}
 
 	buffer.WriteString(" }")
@@ -137,19 +145,26 @@ func (s Struct) CType() string {
 }
 
 func (a Assignment) CInstruction() string {
+
+	switch a.Type.(type) {
+	case Ident:
+		return fmt.Sprintf("struct %s %s = %s;", a.Type.CType(), a.Ident, a.Expr.(Value).CValue())
+	case Array:
+		return fmt.Sprintf("%s %s%s = %s;", a.Type.CType(), a.Ident, a.Type.(Array).Brackets(), a.Expr.(Value).CValue())
+	}
+
 	return fmt.Sprintf("%s %s = %s;", a.Type.CType(), a.Ident, a.Expr.(Value).CValue())
 }
 
 func (s StructInit) CValue() string {
 	var buffer bytes.Buffer
 
-	buffer.WriteString(s.Ident)
-
 	buffer.WriteString(" { ")
 
 	for i, field := range s.Fields {
+		buffer.WriteString(".")
 		buffer.WriteString(field.Ident)
-		buffer.WriteString(": ")
+		buffer.WriteString(" = ")
 		buffer.WriteString(field.Expr.(Value).CValue())
 
 		if i != len(s.Fields)-1 {

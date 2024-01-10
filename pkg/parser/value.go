@@ -173,7 +173,7 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 			counter--
 		}
 
-		fmt.Println("next:", next, "counter:", counter, "is sep:", next.IsSeparator())
+		//fmt.Println("next:", next, "counter:", counter, "is sep:", next.IsSeparator())
 
 		if next.IsSeparator() && counter == 0 && next.Kind != lexer.PARENCLOSE {
 			break
