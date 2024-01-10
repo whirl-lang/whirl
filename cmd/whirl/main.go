@@ -38,7 +38,7 @@ func main() {
 	tokens := lexer.Iterator(bytes)
 	nodes := parser.Iterator(tokens)
 
-	codegen.Generate(nodes)
+	codegen.Generate(&nodes)
 
 	out, err := exec.Command("tcc", "-run", "out.c").Output()
 

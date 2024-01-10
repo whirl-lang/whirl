@@ -1,8 +1,4 @@
-int main(char* a, int b) {
-	return 0;
-}
-
-int test() {
+int main() {
 	return 0;
 }
 

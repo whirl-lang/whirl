@@ -2,11 +2,13 @@ package codegen
 
 import (
 	"os"
-
-	"github.com/whirl-lang/whirl/pkg/parser"
 )
 
-func Generate(nodes parser.InstructionIterator) {
+type InstructionIterator interface {
+	Next() (Instruction, error)
+}
+
+func Generate(nodes InstructionIterator) {
 
 	output := []byte{}
 
@@ -37,21 +39,21 @@ func Generate(nodes parser.InstructionIterator) {
 
 }
 
-func generateCode(node parser.Instruction) []byte {
+func generateCode(node Instruction) []byte {
 	out := []byte{}
 	switch node := node.(type) {
-	case parser.Procedure:
+	case Procedure:
 		out = append(out, []byte(node.ReturnType.CType())...)
 		out = append(out, []byte(" ")...)
-		out = append(out, []byte(node.Indentifier)...)
+		out = append(out, []byte(node.Ident)...)
 		out = append(out, []byte("(")...)
 		//args
 
-		for i, arg := range node.Arguments {
+		for i, arg := range node.Args {
 			out = append(out, []byte(arg.Type.CType())...)
 			out = append(out, []byte(" ")...)
-			out = append(out, []byte(arg.Identifier)...)
-			if i < len(node.Arguments)-1 {
+			out = append(out, []byte(arg.Ident)...)
+			if i < len(node.Args)-1 {
 				out = append(out, []byte(", ")...)
 			}
 		}
@@ -65,7 +67,7 @@ func generateCode(node parser.Instruction) []byte {
 		}
 
 		out = append(out, []byte("}\n\n")...)
-	case parser.Escape:
+	case Escape:
 		out = append(out, []byte("\treturn")...)
 		out = append(out, []byte(" ")...)
 		out = append(out, []byte("0")...)
@@ -74,12 +76,4 @@ func generateCode(node parser.Instruction) []byte {
 
 	return out
 
-	/*
-		returntype name (args) {
-			body
-
-			return value (if not void)
-		}
-
-	*/
 }

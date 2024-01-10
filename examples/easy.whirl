@@ -1,7 +1,3 @@
-proc main(a: string b: int) :: int {
-    escape 0;
-}
-
-proc test() :: int {
+proc main() :: int {
     escape 0;
 }
