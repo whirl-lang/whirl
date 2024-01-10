@@ -52,8 +52,8 @@ Whirl requires the [Tiny C](https://bellard.org/tcc/) compiler to be downloaded 
 
 ### Comments
 
-```rust
-This is a comment
+```r
+ $ This is a comment
 ```
 
 ### Variables

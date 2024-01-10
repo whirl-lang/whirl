@@ -34,6 +34,7 @@ func main() {
 	file.Read(bytes)
 
 	tokens := lexer.Iterator(bytes)
+
 	nodes := parser.Iterator(tokens)
 
 	file, err = os.Create("out.c")
