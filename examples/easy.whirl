@@ -1,7 +1,15 @@
-proc main() :: int {
-	let c: int[][] = [[1], [2,34,645], [6], [17]];
-	let a: int = 10;
-	printf("%s", a[0] + 5);
+struct Test {
+	a: int,
+	b: string,
+}
 
-	escape 0 + 5 * 36 + (5 + 6);
+proc main() :: int {
+	let t: Test = Test {
+		a: 0,
+		b: "hello world",
+	};
+
+	printf("%s", t.b);
+
+	escape 0;
 }

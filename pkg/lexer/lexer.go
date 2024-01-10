@@ -171,6 +171,7 @@ var TokensWithoutSpace = [][]byte{
 	COMMA:     []byte(","),
 	SEMICOLON: []byte(";"),
 	ASSIGN:    []byte("="),
+	PERIOD:    []byte("."),
 
 	PARENOPEN:    []byte("("),
 	PARENCLOSE:   []byte(")"),
@@ -223,6 +224,7 @@ var TokensPretty = []string{
 	OR:  "||",
 	NOT: "!",
 
+	PERIOD:    ".",
 	COLON:     ":",
 	COMMA:     ",",
 	SEMICOLON: ";",
@@ -282,6 +284,7 @@ const (
 	OR
 	NOT
 
+	PERIOD
 	COLON
 	COMMA
 	SEMICOLON

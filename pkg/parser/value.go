@@ -9,13 +9,6 @@ import (
 )
 
 func ParseStructInit(tokens *lexer.TokenIterator) (codegen.StructInit, error) {
-	// get "struct"
-	_, err := ExpectToken(tokens, lexer.STRUCT)
-
-	if err != nil {
-		return codegen.StructInit{}, err
-	}
-
 	// get ident
 	ident, err := ParseIdent(tokens)
 
@@ -179,6 +172,8 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 		if next.Kind == lexer.PARENCLOSE {
 			counter--
 		}
+
+		fmt.Println("next:", next, "counter:", counter, "is sep:", next.IsSeparator())
 
 		if next.IsSeparator() && counter == 0 && next.Kind != lexer.PARENCLOSE {
 			break

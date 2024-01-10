@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/whirl-lang/whirl/pkg/codegen"
 	"github.com/whirl-lang/whirl/pkg/lexer"
 )
@@ -56,10 +54,6 @@ func ParseAssignment(tokens *lexer.TokenIterator) (codegen.Assignment, error) {
 
 		if err != nil {
 			return codegen.Assignment{}, err
-		}
-
-		if ident.Name != structure.Ident {
-			return codegen.Assignment{}, fmt.Errorf("expected identifier %s, got %s", ident.Name, structure.Ident)
 		}
 
 		return codegen.Assignment{Ident: ident.Name, Expr: structure, Type: typ}, nil
