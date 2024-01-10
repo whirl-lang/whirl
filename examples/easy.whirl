@@ -1,4 +1,7 @@
-proc main() :: int {
-    let a: int = 5;
-    escape a;
+proc main(a: string b: int) :: int {
+    escape 0;
+}
+
+proc test() :: int {
+    escape 0;
 }

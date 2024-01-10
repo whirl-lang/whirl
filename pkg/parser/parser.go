@@ -726,7 +726,7 @@ type Int struct {
 }
 
 func (i Int) CType() string {
-	return "int64_t"
+	return "int"
 }
 
 func (i Int) CValue() string {
