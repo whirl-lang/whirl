@@ -122,3 +122,8 @@ type Until struct {
 	Condition Expr
 	Body      []Instruction
 }
+
+type Reassign struct {
+	Ident string
+	Expr  Expr
+}

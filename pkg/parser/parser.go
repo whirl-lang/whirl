@@ -66,11 +66,26 @@ func ParseInstruction(tokens *lexer.TokenIterator) (codegen.Instruction, error) 
 		return ParseEscape(tokens)
 	case lexer.PROC:
 		return ParseProcedure(tokens)
+	case lexer.UNTIL:
+		return ParseUntil(tokens)
+	case lexer.ITER:
+		return ParseIter(tokens)
 	case lexer.IDENT:
-		call, err := ParseProcedureCall(tokens)
+		ident, err := ParseIdent(tokens)
 
 		if err != nil {
-			return nil, err
+			return codegen.ProcedureCall{}, err
+		}
+
+		var instruction codegen.Instruction
+		instruction, err = ParseProcedureCall(tokens, ident)
+
+		if err != nil {
+			instruction, err = ParseReassign(tokens, ident)
+
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		_, err = ExpectToken(tokens, lexer.SEMICOLON)
@@ -79,7 +94,7 @@ func ParseInstruction(tokens *lexer.TokenIterator) (codegen.Instruction, error) 
 			return nil, err
 		}
 
-		return call, nil
+		return instruction, nil
 	}
 
 	_, err = ExpectToken(tokens, lexer.EOF)

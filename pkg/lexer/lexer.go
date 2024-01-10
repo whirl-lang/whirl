@@ -45,18 +45,16 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 	// check for keywords
 	//keywords must have a space, tab or newline after them
-	for i := IF; i <= STRUCT; i++ {
+	for i := IF; i <= IN; i++ {
 		word := TokensWithSpace[i]
 
 		if iter.FoundToken(word, true) {
-
 			return Token{i, string(word)}, nil
 		}
-
 	}
 
 	//check for the rest
-	for i := EQ; i <= STRING; i++ {
+	for i := LE; i <= STRING; i++ {
 		word := TokensWithoutSpace[i]
 
 		if iter.FoundToken(word, false) {
@@ -154,6 +152,7 @@ var TokensWithSpace = [][]byte{
 	ESCAPE:   []byte("escape"),
 	BREAK:    []byte("break"),
 	STRUCT:   []byte("struct"),
+	IN:       []byte("in"),
 }
 
 var TokensWithoutSpace = [][]byte{
@@ -213,6 +212,7 @@ var TokensPretty = []string{
 	ESCAPE:   "escape",
 	BREAK:    "break",
 	STRUCT:   "struct",
+	IN:       "in",
 
 	EQ:  "==",
 	NE:  "!=",
@@ -272,14 +272,15 @@ const (
 	ESCAPE
 	BREAK
 	STRUCT
+	IN
 
 	//Operators
+	LE
+	GE
 	EQ
 	NE
 	LT
 	GT
-	LE
-	GE
 	AND
 	OR
 	NOT

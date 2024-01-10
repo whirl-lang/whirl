@@ -181,6 +181,23 @@ func (s Struct) CInstruction() string {
 	return s.CType() + ";"
 }
 
+func (u Until) CInstruction() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString("while (!(")
+	buffer.WriteString(u.Condition.(Value).CValue())
+	buffer.WriteString(")) { ")
+
+	for _, instruction := range u.Body {
+		buffer.WriteString(instruction.CInstruction())
+		buffer.WriteString(" ")
+	}
+
+	buffer.WriteString("}")
+
+	return buffer.String()
+}
+
 func (i If) CInstruction() string {
 	var buffer bytes.Buffer
 
@@ -213,6 +230,35 @@ func (i If) CInstruction() string {
 
 func (esc Escape) CInstruction() string {
 	return fmt.Sprintf("return %s;", esc.Expr.(Value).CValue())
+}
+
+func (r Reassign) CInstruction() string {
+	return fmt.Sprintf("%s = %s;", r.Ident, r.Expr.(Value).CValue())
+}
+
+func (i Iter) CInstruction() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString("for (int ")
+	buffer.WriteString(i.Ident)
+	buffer.WriteString(" = ")
+	buffer.WriteString(i.Lower.CValue())
+	buffer.WriteString("; ")
+	buffer.WriteString(i.Ident)
+	buffer.WriteString(" < ")
+	buffer.WriteString(i.Upper.CValue())
+	buffer.WriteString("; ")
+	buffer.WriteString(i.Ident)
+	buffer.WriteString("++) { ")
+
+	for _, instruction := range i.Body {
+		buffer.WriteString(instruction.CInstruction())
+		buffer.WriteString(" ")
+	}
+
+	buffer.WriteString("}")
+
+	return buffer.String()
 }
 
 func (e ExprMath) CValue() string {

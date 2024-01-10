@@ -215,6 +215,31 @@ func ParseProcedure(tokens *lexer.TokenIterator) (codegen.Procedure, error) {
 	}, nil
 }
 
+func ParseUntil(tokens *lexer.TokenIterator) (codegen.Until, error) {
+	// get "until"
+	_, err := ExpectToken(tokens, lexer.UNTIL)
+
+	if err != nil {
+		return codegen.Until{}, err
+	}
+
+	// get condition
+	condition, err := ParseExpr(tokens)
+
+	if err != nil {
+		return codegen.Until{}, err
+	}
+
+	// get body
+	body, err := ParseBody(tokens)
+
+	if err != nil {
+		return codegen.Until{}, err
+	}
+
+	return codegen.Until{Condition: condition, Body: body}, nil
+}
+
 func ParseArg(tokens *lexer.TokenIterator) (codegen.Argument, error) {
 	// get ident
 	ident, err := ParseIdent(tokens)
@@ -238,6 +263,76 @@ func ParseArg(tokens *lexer.TokenIterator) (codegen.Argument, error) {
 	}
 
 	return codegen.Argument{Ident: ident.Name, Type: typ}, nil
+}
+
+func ParseReassign(tokens *lexer.TokenIterator, ident codegen.Ident) (codegen.Reassign, error) {
+
+	// get equals
+	_, err := ExpectToken(tokens, lexer.ASSIGN)
+
+	if err != nil {
+		return codegen.Reassign{}, err
+	}
+
+	// get expression
+	expr, err := ParseExpr(tokens)
+
+	if err != nil {
+		return codegen.Reassign{}, err
+	}
+
+	return codegen.Reassign{Ident: ident.Name, Expr: expr}, nil
+}
+
+func ParseIter(tokens *lexer.TokenIterator) (codegen.Iter, error) {
+	// get "iter"
+	_, err := ExpectToken(tokens, lexer.ITER)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	// get ident
+	ident, err := ParseIdent(tokens)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	_, err = ExpectToken(tokens, lexer.IN)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	// get lower
+	lower, err := ParseExpr(tokens)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	_, err = ExpectToken(tokens, lexer.COLON)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	// get upper
+	upper, err := ParseExpr(tokens)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	// get body
+	body, err := ParseBody(tokens)
+
+	if err != nil {
+		return codegen.Iter{}, err
+	}
+
+	return codegen.Iter{Ident: ident.Name, Lower: lower, Upper: upper, Body: body}, nil
 }
 
 func ParseArgs(tokens *lexer.TokenIterator) ([]codegen.Argument, error) {
@@ -273,16 +368,10 @@ func ParseArgs(tokens *lexer.TokenIterator) ([]codegen.Argument, error) {
 	return args, nil
 }
 
-func ParseProcedureCall(tokens *lexer.TokenIterator) (codegen.ProcedureCall, error) {
-	// get ident
-	ident, err := ParseIdent(tokens)
-
-	if err != nil {
-		return codegen.ProcedureCall{}, err
-	}
+func ParseProcedureCall(tokens *lexer.TokenIterator, ident codegen.Ident) (codegen.ProcedureCall, error) {
 
 	// get open parens
-	_, err = ExpectToken(tokens, lexer.PARENOPEN)
+	_, err := ExpectToken(tokens, lexer.PARENOPEN)
 
 	if err != nil {
 		return codegen.ProcedureCall{}, err
