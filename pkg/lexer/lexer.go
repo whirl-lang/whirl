@@ -55,7 +55,6 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 		if iter.FoundToken(word, true) {
 
-			//fmt.Println("2")
 			return Token{i, string(word)}, nil
 		}
 
@@ -66,7 +65,6 @@ func (iter *TokenIterator) Next() (Token, error) {
 		word := TokensWithoutSpace[i]
 
 		if iter.FoundToken(word, false) {
-			//fmt.Println("3")
 			return Token{i, string(word)}, nil
 		}
 	}
@@ -92,7 +90,7 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 		iter.Bytes = iter.Bytes[1:]
 
-		return Token{STRING_LIT, string(str)}, nil
+		return Token{STRING_LIT, "\"" + string(str) + "\""}, nil
 	}
 
 	//check for char

@@ -68,11 +68,11 @@ let z = x + y;
 
 ```c
 if x == 1 {
-    printf("x is 1");
+  printf("x is 1");
 } else if x == 2 {
-    printf("x is 2")
+  printf("x is 2")
 } else {
-    printf("x is neither 1 or 2")
+  printf("x is neither 1 or 2")
 }
 ```
 
@@ -80,7 +80,7 @@ if x == 1 {
 
 ```rust
 proc main() :: int {
-    escape 0;
+  escape 0;
 }
 ```
 

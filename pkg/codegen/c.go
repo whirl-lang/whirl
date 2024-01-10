@@ -187,3 +187,26 @@ func (e ExprMath) CValue() string {
 
 	return buffer.String()
 }
+
+func (p ProcedureCall) CValue() string {
+	var buffer bytes.Buffer
+
+	buffer.WriteString(p.Ident)
+	buffer.WriteString("(")
+
+	for i, arg := range p.Args {
+		buffer.WriteString(arg.(Value).CValue())
+
+		if i != len(p.Args)-1 {
+			buffer.WriteString(", ")
+		}
+	}
+
+	buffer.WriteString(")")
+
+	return buffer.String()
+}
+
+func (p ProcedureCall) CInstruction() string {
+	return fmt.Sprintf("%s;", p.CValue())
+}

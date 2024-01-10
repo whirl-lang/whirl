@@ -1,3 +1,7 @@
 proc main() :: int {
+	let a: int = 10;
+	printf("%s", a + 5);
+
+
 	escape 0 + 5 * 36 + (5 + 6);
 }
