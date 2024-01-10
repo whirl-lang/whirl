@@ -67,7 +67,8 @@ func ParseProcedureCall(tokens *lexer.TokenIterator) (ProcedureCall, error) {
 		}
 
 		if next.Kind == lexer.COMMA {
-
+		}
+	}
 
 	// get close parens
 	_, err = ExpectToken(tokens, lexer.PARENCLOSE)
@@ -711,6 +712,8 @@ func ParseType(tokens *lexer.TokenIterator) (Type, error) {
 		return Bool{}, nil
 	case lexer.CHAR:
 		return Char{}, nil
+	case lexer.VOID:
+		return Void{}, nil
 	case lexer.IDENT:
 		return Ident{Name: tok.Value}, nil
 	}
@@ -792,6 +795,22 @@ func ParseBool(tokens *lexer.TokenIterator) (Bool, error) {
 	}
 
 	return Bool{token.Value == "true"}, nil
+}
+
+type Void struct{}
+
+func (v Void) CType() string {
+	return "void"
+}
+
+func ParseVoid(tokens *lexer.TokenIterator) (Void, error) {
+	_, err := ExpectToken(tokens, lexer.VOID)
+
+	if err != nil {
+		return Void{}, err
+	}
+
+	return Void{}, nil
 }
 
 type Char struct {
