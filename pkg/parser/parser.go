@@ -21,6 +21,64 @@ type Argument struct {
 	Type       Type
 }
 
+type ProcedureCall struct {
+	Identifier string
+	Arguments  []Expression
+}
+
+func ParseProcedureCall(tokens *lexer.TokenIterator) (ProcedureCall, error) {
+	// get ident
+	ident, err := ParseIdent(tokens)
+
+	if err != nil {
+		return ProcedureCall{}, err
+	}
+
+	// get open parens
+	_, err = ExpectToken(tokens, lexer.PARENOPEN)
+
+	if err != nil {
+		return ProcedureCall{}, err
+	}
+
+	// get args
+	next, err := tokens.Peek()
+
+	if err != nil {
+		return ProcedureCall{}, err
+	}
+
+	var args []Expression
+
+	// FIXME: make this work
+	for next.Kind != lexer.PARENCLOSE {
+		arg, err := ParseExpression(tokens)
+
+		if err != nil {
+			return ProcedureCall{}, err
+		}
+
+		args = append(args, arg)
+
+		next, err = tokens.Peek()
+
+		if err != nil {
+			return ProcedureCall{}, err
+		}
+
+		if next.Kind == lexer.COMMA {
+
+
+	// get close parens
+	_, err = ExpectToken(tokens, lexer.PARENCLOSE)
+
+	if err != nil {
+		return ProcedureCall{}, err
+	}
+
+	return ProcedureCall{ident.Name, args}, nil
+}
+
 func ParseProcedure(tokens *lexer.TokenIterator) (Procedure, error) {
 	// get "proc"
 	_, err := ExpectToken(tokens, lexer.PROC)
@@ -318,6 +376,28 @@ func ParseAssignment(tokens *lexer.TokenIterator) (Assignment, error) {
 		return Assignment{}, err
 	}
 
+	switch typ.(type) {
+	case Ident:
+		structure, err := ParseStructInit(tokens)
+
+		if err != nil {
+			return Assignment{}, err
+		}
+
+		// get semi
+		_, err = ExpectToken(tokens, lexer.SEMICOLON)
+
+		if err != nil {
+			return Assignment{}, err
+		}
+
+		if ident.Name != structure.Identifier {
+			return Assignment{}, fmt.Errorf("expected identifier %s, got %s", ident.Name, structure.Identifier)
+		}
+
+		return Assignment{ident.Name, structure, typ}, nil
+	}
+
 	// get expression
 	expr, err := ParseExpression(tokens)
 
@@ -406,6 +486,77 @@ func ParseStruct(tokens *lexer.TokenIterator) (Struct, error) {
 	return structure, nil
 }
 
+type StructInit struct {
+	Identifier string
+	Fields     []FieldInit
+}
+
+func ParseStructInit(tokens *lexer.TokenIterator) (StructInit, error) {
+	// get "struct"
+	_, err := ExpectToken(tokens, lexer.STRUCT)
+
+	if err != nil {
+		return StructInit{}, err
+	}
+
+	// get ident
+	ident, err := ParseIdent(tokens)
+
+	if err != nil {
+		return StructInit{}, err
+	}
+
+	// get open brace
+	_, err = ExpectToken(tokens, lexer.CURLYOPEN)
+
+	if err != nil {
+		return StructInit{}, err
+	}
+
+	structure := StructInit{
+		Identifier: ident.Name,
+	}
+	next, err := tokens.Peek()
+
+	if err != nil {
+		return StructInit{}, err
+	}
+
+	// fields...
+	for next.Kind != lexer.CURLYCLOSE {
+		field, err := ParseInitField(tokens)
+
+		if err != nil {
+			return StructInit{}, err
+		}
+
+		// get comma
+		_, err = ExpectToken(tokens, lexer.COMMA)
+
+		if err != nil {
+			return StructInit{}, err
+		}
+
+		// add field to struct
+		structure.Fields = append(structure.Fields, field)
+
+		next, err = tokens.Peek()
+
+		if err != nil {
+			return StructInit{}, err
+		}
+	}
+
+	// get close brace
+	_, err = ExpectToken(tokens, lexer.CURLYCLOSE)
+
+	if err != nil {
+		return StructInit{}, err
+	}
+
+	return structure, nil
+}
+
 type Field struct {
 	Identifier string
 	Type       Type
@@ -436,13 +587,45 @@ func ParseField(tokens *lexer.TokenIterator) (Field, error) {
 	return Field{ident.Name, typ}, nil
 }
 
+type FieldInit struct {
+	Identifier string
+	Expression Expression
+}
+
+func ParseInitField(tokens *lexer.TokenIterator) (FieldInit, error) {
+	// get ident
+	ident, err := ParseIdent(tokens)
+
+	if err != nil {
+		return FieldInit{}, err
+	}
+
+	// get colon
+	_, err = ExpectToken(tokens, lexer.COLON)
+
+	if err != nil {
+		return FieldInit{}, err
+	}
+
+	// get expression
+	expr, err := ParseExpression(tokens)
+
+	if err != nil {
+		return FieldInit{}, err
+	}
+
+	return FieldInit{ident.Name, expr}, nil
+}
+
 type If struct {
 	Condition Expression
 	Body      []Instruction
 	Else      []Instruction
 }
 
-type Expression struct {
+type Expression interface{}
+
+type ExpressionMath struct {
 	Tokens []lexer.Token
 }
 
@@ -450,11 +633,11 @@ func ParseExpression(tokens *lexer.TokenIterator) (Expression, error) {
 	next, err := tokens.Peek()
 
 	if err != nil {
-		return Expression{}, err
+		return ExpressionMath{}, err
 	}
 
 	counter := 0
-	expr := Expression{}
+	expr := ExpressionMath{}
 
 	// capture until open parens equal closed parens
 	// and the next token isn't a closeable one
@@ -528,6 +711,8 @@ func ParseType(tokens *lexer.TokenIterator) (Type, error) {
 		return Bool{}, nil
 	case lexer.CHAR:
 		return Char{}, nil
+	case lexer.IDENT:
+		return Ident{Name: tok.Value}, nil
 	}
 
 	return nil, fmt.Errorf("unexpected token %s", lexer.TokensPretty[tok.Kind])
