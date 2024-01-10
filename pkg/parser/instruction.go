@@ -106,7 +106,7 @@ func ParseIf(tokens *lexer.TokenIterator) (codegen.If, error) {
 			Condition: condition,
 			Body:      body,
 			Else:      nil,
-		}, err
+		}, nil
 	}
 
 	// get else body
