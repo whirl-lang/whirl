@@ -5,6 +5,7 @@ import (
 	"os"
 
 	lexer "github.com/whirl-lang/whirl/pkg/lexer"
+	"github.com/whirl-lang/whirl/pkg/parser"
 )
 
 func main() {
@@ -31,22 +32,19 @@ func main() {
 	file.Read(bytes)
 
 	tokens := lexer.Iterator(bytes)
+	nodes := parser.Iterator(tokens)
 
-	t, err := tokens.Next()
-	fmt.Println(t)
-	if err != nil {
-		panic(err)
-	}
-
-	for t.Kind != lexer.EOF {
-
-		t, err = tokens.Next()
+	for {
+		node, err := nodes.Next()
 
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(t)
 
+		if node == nil {
+			break
+		}
+
+		fmt.Println(node)
 	}
-
 }

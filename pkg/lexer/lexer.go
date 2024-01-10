@@ -5,10 +5,32 @@ import (
 )
 
 type TokenIterator struct {
-	Bytes []byte
+	Bytes     []byte
+	NextToken *Token
+}
+
+func (iter *TokenIterator) Peek() (Token, error) {
+	if iter.NextToken == nil {
+		token, err := iter.Next()
+
+		if err != nil {
+			return Token{}, err
+		}
+
+		iter.NextToken = &token
+	}
+
+	return *iter.NextToken, nil
 }
 
 func (iter *TokenIterator) Next() (Token, error) {
+	if iter.NextToken != nil {
+		token := *iter.NextToken
+		iter.NextToken = nil
+
+		return token, nil
+	}
+
 	//fmt.Println(string(iter.Bytes))
 	if len(iter.Bytes) == 0 {
 		//fmt.Println("0")
@@ -181,6 +203,63 @@ type Token struct {
 	Value string
 }
 
+func (t Token) IsSeparator() bool {
+	return (t.Kind >= COLON && t.Kind <= CURLYCLOSE) || (t.Kind >= IF && t.Kind <= STRUCT)
+}
+
+var TokensPretty = []string{
+	IF:       "if",
+	LET:      "let",
+	UNTIL:    "until",
+	ITER:     "iter",
+	ELSE:     "else",
+	PROC:     "proc",
+	CONTINUE: "continue",
+	ESCAPE:   "escape",
+	BREAK:    "break",
+	STRUCT:   "struct",
+
+	EQ:  "==",
+	NE:  "!=",
+	LT:  "<",
+	GT:  ">",
+	LE:  "<=",
+	GE:  ">=",
+	AND: "&&",
+	OR:  "||",
+	NOT: "!",
+
+	COLON:     ":",
+	COMMA:     ",",
+	SEMICOLON: ";",
+	ASSIGN:    "=",
+
+	PARENOPEN:  "(",
+	PARENCLOSE: ")",
+	CURLYOPEN:  "{",
+	CURLYCLOSE: "}",
+
+	PLUS:  "+",
+	MINUS: "-",
+	MUL:   "*",
+	DIV:   "/",
+	MOD:   "%",
+
+	BOOLEAN: "bool",
+	CHAR:    "char",
+	VOID:    "void",
+	INT:     "int",
+	STRING:  "string",
+
+	IDENT:       "<identifier>",
+	INT_LIT:     "<integer>",
+	STRING_LIT:  "<string>",
+	BOOLEAN_LIT: "<boolean>",
+	CHAR_LIT:    "<character>",
+
+	EOF: "EOF",
+}
+
 const (
 	//the order matters here
 
@@ -245,5 +324,5 @@ const (
 )
 
 func Iterator(input []byte) TokenIterator {
-	return TokenIterator{input}
+	return TokenIterator{input, nil}
 }

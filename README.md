@@ -13,7 +13,7 @@ This is the main source code repository for Whirl. It contains the compiler, sta
   - [Variables](#variables)
   - [Control flow](#control-flow)
   - [Functions](#functions)
-- [License](#License)
+- [License](#license)
 
 ## Installation
 
@@ -53,7 +53,7 @@ Whirl requires the [Tiny C](https://bellard.org/tcc/) compiler to be downloaded 
 ### Comments
 
 ```rust
-$ This is a comment
+This is a comment
 ```
 
 ### Variables
