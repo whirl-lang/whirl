@@ -178,7 +178,6 @@ func (esc Escape) CInstruction() string {
 	return fmt.Sprintf("return %s;", esc.Expr.(Value).CValue())
 }
 
-// FIXME: this is not correct
 func (e ExprMath) CValue() string {
 	var buffer bytes.Buffer
 
