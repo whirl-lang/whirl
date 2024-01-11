@@ -72,7 +72,7 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 	// check for keywords
 	//keywords must have a space, tab or newline after them
-	for i := IF; i <= IN; i++ {
+	for i := IF; i <= AS; i++ {
 		word := TokensWithSpace[i]
 
 		if iter.FoundToken(word, true) {
@@ -180,6 +180,8 @@ var TokensWithSpace = [][]byte{
 	BREAK:    []byte("break"),
 	STRUCT:   []byte("struct"),
 	IN:       []byte("in"),
+	IMPORT:   []byte("import"),
+	AS:       []byte("as"),
 }
 
 var TokensWithoutSpace = [][]byte{
@@ -193,11 +195,12 @@ var TokensWithoutSpace = [][]byte{
 	OR:  []byte("||"),
 	NOT: []byte("!"),
 
-	COLON:     []byte(":"),
-	COMMA:     []byte(","),
-	SEMICOLON: []byte(";"),
-	ASSIGN:    []byte("="),
-	PERIOD:    []byte("."),
+	COLONCOLON: []byte("::"),
+	COLON:      []byte(":"),
+	COMMA:      []byte(","),
+	SEMICOLON:  []byte(";"),
+	ASSIGN:     []byte("="),
+	PERIOD:     []byte("."),
 
 	PARENOPEN:    []byte("("),
 	PARENCLOSE:   []byte(")"),
@@ -240,6 +243,8 @@ var TokensPretty = []string{
 	BREAK:    "break",
 	STRUCT:   "struct",
 	IN:       "in",
+	IMPORT:   "import",
+	AS:       "as",
 
 	EQ:  "==",
 	NE:  "!=",
@@ -251,11 +256,12 @@ var TokensPretty = []string{
 	OR:  "||",
 	NOT: "!",
 
-	PERIOD:    ".",
-	COLON:     ":",
-	COMMA:     ",",
-	SEMICOLON: ";",
-	ASSIGN:    "=",
+	PERIOD:     ".",
+	COLONCOLON: "::",
+	COLON:      ":",
+	COMMA:      ",",
+	SEMICOLON:  ";",
+	ASSIGN:     "=",
 
 	PARENOPEN:    "(",
 	PARENCLOSE:   ")",
@@ -300,6 +306,8 @@ const (
 	BREAK
 	STRUCT
 	IN
+	IMPORT
+	AS
 
 	//Operators
 	LE
@@ -313,6 +321,7 @@ const (
 	NOT
 
 	PERIOD
+	COLONCOLON
 	COLON
 	COMMA
 	SEMICOLON

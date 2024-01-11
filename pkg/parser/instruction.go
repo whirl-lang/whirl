@@ -56,7 +56,7 @@ func ParseAssignment(tokens *lexer.TokenIterator) (codegen.Assignment, error) {
 			return codegen.Assignment{}, err
 		}
 
-		return codegen.Assignment{Ident: ident.Name, Expr: structure, Type: typ}, nil
+		return codegen.Assignment{Ident: ident, Expr: structure, Type: typ}, nil
 	}
 
 	// get expression
@@ -73,7 +73,7 @@ func ParseAssignment(tokens *lexer.TokenIterator) (codegen.Assignment, error) {
 		return codegen.Assignment{}, err
 	}
 
-	return codegen.Assignment{Ident: ident.Name, Expr: expr, Type: typ}, nil
+	return codegen.Assignment{Ident: ident, Expr: expr, Type: typ}, nil
 }
 
 func ParseIf(tokens *lexer.TokenIterator) (codegen.If, error) {
@@ -209,7 +209,7 @@ func ParseProcedure(tokens *lexer.TokenIterator) (codegen.Procedure, error) {
 	}
 
 	return codegen.Procedure{
-		Ident:        ident.Name,
+		Ident:        ident,
 		Args:         args,
 		Instructions: body,
 		ReturnType:   returnType,
@@ -263,11 +263,10 @@ func ParseArg(tokens *lexer.TokenIterator) (codegen.Argument, error) {
 		return codegen.Argument{}, err
 	}
 
-	return codegen.Argument{Ident: ident.Name, Type: typ}, nil
+	return codegen.Argument{Ident: ident, Type: typ}, nil
 }
 
-func ParseReassign(tokens *lexer.TokenIterator, ident codegen.Ident) (codegen.Reassign, error) {
-
+func ParseReassign(tokens *lexer.TokenIterator, path codegen.Path) (codegen.Reassign, error) {
 	// get equals
 	_, err := ExpectToken(tokens, lexer.ASSIGN)
 
@@ -282,7 +281,7 @@ func ParseReassign(tokens *lexer.TokenIterator, ident codegen.Ident) (codegen.Re
 		return codegen.Reassign{}, err
 	}
 
-	return codegen.Reassign{Ident: ident.Name, Expr: expr}, nil
+	return codegen.Reassign{Ident: path, Expr: expr}, nil
 }
 
 func ParseIter(tokens *lexer.TokenIterator) (codegen.Iter, error) {
@@ -333,7 +332,7 @@ func ParseIter(tokens *lexer.TokenIterator) (codegen.Iter, error) {
 		return codegen.Iter{}, err
 	}
 
-	return codegen.Iter{Ident: ident.Name, Lower: lower, Upper: upper, Body: body}, nil
+	return codegen.Iter{Ident: ident, Lower: lower, Upper: upper, Body: body}, nil
 }
 
 func ParseBreak(tokens *lexer.TokenIterator) (codegen.Break, error) {
@@ -409,7 +408,7 @@ func ParseArgs(tokens *lexer.TokenIterator) ([]codegen.Argument, error) {
 	return args, nil
 }
 
-func ParseProcedureCall(tokens *lexer.TokenIterator, ident codegen.Ident) (codegen.ProcedureCall, error) {
+func ParseProcedureCall(tokens *lexer.TokenIterator, path codegen.Path) (codegen.ProcedureCall, error) {
 
 	// get open parens
 	_, err := ExpectToken(tokens, lexer.PARENOPEN)
@@ -456,5 +455,5 @@ func ParseProcedureCall(tokens *lexer.TokenIterator, ident codegen.Ident) (codeg
 		return codegen.ProcedureCall{}, err
 	}
 
-	return codegen.ProcedureCall{Ident: ident.Name, Args: args}, nil
+	return codegen.ProcedureCall{Ident: path, Args: args}, nil
 }

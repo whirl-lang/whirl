@@ -9,7 +9,12 @@ type InstructionIterator interface {
 	Next() (Instruction, error)
 }
 
-func Generate(nodes InstructionIterator, out io.Writer) {
+type Context struct {
+	Namespace string
+	Transpile func(content []byte, namespace string) string
+}
+
+func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) {
 	writer := bufio.NewWriter(out)
 
 	defer writer.Flush()
@@ -25,6 +30,6 @@ func Generate(nodes InstructionIterator, out io.Writer) {
 			break
 		}
 
-		writer.WriteString(node.CInstruction())
+		writer.WriteString(node.CInstruction(ctx))
 	}
 }

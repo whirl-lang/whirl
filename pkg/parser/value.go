@@ -24,7 +24,7 @@ func ParseStructInit(tokens *lexer.TokenIterator) (codegen.StructInit, error) {
 	}
 
 	structure := codegen.StructInit{
-		Ident: ident.Name,
+		Ident: ident,
 	}
 	next, err := tokens.Peek()
 
@@ -89,7 +89,7 @@ func ParseInitField(tokens *lexer.TokenIterator) (codegen.FieldInit, error) {
 		return codegen.FieldInit{}, err
 	}
 
-	return codegen.FieldInit{Ident: ident.Name, Expr: expr}, nil
+	return codegen.FieldInit{Ident: ident, Expr: expr}, nil
 }
 
 func ParseArray(tokens *lexer.TokenIterator) (codegen.Array, error) {
@@ -233,7 +233,7 @@ func ParseExpr(tokens *lexer.TokenIterator) (codegen.Expr, error) {
 }
 
 func ParseInt(tokens *lexer.TokenIterator) (codegen.Int, error) {
-	token, err := ExpectToken(tokens, lexer.INT)
+	token, err := ExpectToken(tokens, lexer.INT_LIT)
 
 	if err != nil {
 		return codegen.Int{}, err
@@ -249,7 +249,7 @@ func ParseInt(tokens *lexer.TokenIterator) (codegen.Int, error) {
 }
 
 func ParseString(tokens *lexer.TokenIterator) (codegen.String, error) {
-	token, err := ExpectToken(tokens, lexer.STRING)
+	token, err := ExpectToken(tokens, lexer.STRING_LIT)
 
 	if err != nil {
 		return codegen.String{}, err
@@ -259,7 +259,7 @@ func ParseString(tokens *lexer.TokenIterator) (codegen.String, error) {
 }
 
 func ParseBool(tokens *lexer.TokenIterator) (codegen.Bool, error) {
-	token, err := ExpectToken(tokens, lexer.BOOLEAN)
+	token, err := ExpectToken(tokens, lexer.BOOLEAN_LIT)
 
 	if err != nil {
 		return codegen.Bool{}, err
@@ -279,7 +279,7 @@ func ParseVoid(tokens *lexer.TokenIterator) (codegen.Void, error) {
 }
 
 func ParseChar(tokens *lexer.TokenIterator) (codegen.Char, error) {
-	token, err := ExpectToken(tokens, lexer.CHAR)
+	token, err := ExpectToken(tokens, lexer.CHAR_LIT)
 
 	if err != nil {
 		return codegen.Char{}, err

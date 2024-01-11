@@ -1,0 +1,7 @@
+import "b.whirl" as b;
+
+proc main() :: int {
+	b::hello();
+
+	escape 0;
+}

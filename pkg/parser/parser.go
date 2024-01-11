@@ -7,6 +7,38 @@ import (
 	"github.com/whirl-lang/whirl/pkg/lexer"
 )
 
+func ParseImport(tokens *lexer.TokenIterator) (codegen.Import, error) {
+	// get "import"
+	_, err := ExpectToken(tokens, lexer.IMPORT)
+
+	if err != nil {
+		return codegen.Import{}, err
+	}
+
+	// get path
+	path, err := ParseString(tokens)
+
+	if err != nil {
+		return codegen.Import{}, err
+	}
+
+	// get as
+	_, err = ExpectToken(tokens, lexer.AS)
+
+	if err != nil {
+		return codegen.Import{}, err
+	}
+
+	// get ident
+	ident, err := ParseIdent(tokens)
+
+	if err != nil {
+		return codegen.Import{}, err
+	}
+
+	return codegen.Import{Path: path.Value, Ident: ident}, nil
+}
+
 func ParseBody(tokens *lexer.TokenIterator) ([]codegen.Instruction, error) {
 
 	// parse curly open
@@ -83,18 +115,20 @@ func ParseInstruction(tokens *lexer.TokenIterator) (codegen.Instruction, error) 
 		return ParseUntil(tokens)
 	case lexer.ITER:
 		return ParseIter(tokens)
+	case lexer.IMPORT:
+		return ParseImport(tokens)
 	case lexer.IDENT:
-		ident, err := ParseIdent(tokens)
+		path, err := ParsePath(tokens)
 
 		if err != nil {
 			return codegen.ProcedureCall{}, err
 		}
 
 		var instruction codegen.Instruction
-		instruction, err = ParseProcedureCall(tokens, ident)
+		instruction, err = ParseProcedureCall(tokens, path)
 
 		if err != nil {
-			instruction, err = ParseReassign(tokens, ident)
+			instruction, err = ParseReassign(tokens, path)
 
 			if err != nil {
 				return nil, err
@@ -180,6 +214,48 @@ func ParseIdent(tokens *lexer.TokenIterator) (codegen.Ident, error) {
 	}
 
 	return codegen.Ident{Name: token.Value}, nil
+}
+
+func ParsePath(tokens *lexer.TokenIterator) (codegen.Path, error) {
+	token, err := ExpectToken(tokens, lexer.IDENT)
+
+	if err != nil {
+		return codegen.Path{}, err
+	}
+
+	next, err := tokens.Peek()
+
+	if err != nil {
+		return codegen.Path{}, err
+	}
+
+	path := codegen.Path{
+		Tokens: []codegen.Ident{{Name: token.Value}},
+	}
+
+	for next.Kind == lexer.COLONCOLON {
+		_, err = ExpectToken(tokens, lexer.COLONCOLON)
+
+		if err != nil {
+			return codegen.Path{}, err
+		}
+
+		token, err = ExpectToken(tokens, lexer.IDENT)
+
+		if err != nil {
+			return codegen.Path{}, err
+		}
+
+		path.Tokens = append(path.Tokens, codegen.Ident{Name: token.Value})
+
+		next, err = tokens.Peek()
+
+		if err != nil {
+			return codegen.Path{}, err
+		}
+	}
+
+	return path, nil
 }
 
 func ExpectToken(tokens *lexer.TokenIterator, token int) (lexer.Token, error) {

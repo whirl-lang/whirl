@@ -6,9 +6,7 @@ import (
 	"os/exec"
 
 	"github.com/urfave/cli/v2"
-	"github.com/whirl-lang/whirl/pkg/codegen"
-	"github.com/whirl-lang/whirl/pkg/lexer"
-	"github.com/whirl-lang/whirl/pkg/parser"
+	"github.com/whirl-lang/whirl/pkg/pipeline"
 )
 
 func main() {
@@ -20,6 +18,7 @@ func main() {
 			return nil
 		},
 	}
+	app.Run(os.Args)
 
 	args := os.Args
 
@@ -43,17 +42,13 @@ func main() {
 	bytes := make([]byte, stat.Size())
 	file.Read(bytes)
 
-	tokens := lexer.Iterator(bytes)
-
-	nodes := parser.Iterator(tokens)
-
 	file, err = os.Create("out.c")
 
 	if err != nil {
 		panic(err)
 	}
 
-	codegen.Generate(&nodes, file)
+	file.WriteString(pipeline.TranspileC(bytes, ""))
 
 	out, err := exec.Command("tcc", "-run", "out.c").Output()
 

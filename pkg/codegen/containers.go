@@ -3,51 +3,51 @@ package codegen
 import "github.com/whirl-lang/whirl/pkg/lexer"
 
 type Instruction interface {
-	CInstruction() string
+	CInstruction(ctx Context) string
 }
 
 type Type interface {
-	CType() string
+	CType(ctx Context) string
 }
 
 type Value interface {
-	CValue() string
+	CValue(ctx Context) string
 }
 
 type Procedure struct {
-	Ident        string
+	Ident        Ident
 	Args         []Argument
 	Instructions []Instruction
 	ReturnType   Type
 }
 
 type Argument struct {
-	Ident string
+	Ident Ident
 	Type  Type
 }
 
 type ProcedureCall struct {
-	Ident string
+	Ident Path
 	Args  []Expr
 }
 
 type Struct struct {
-	Ident  string
+	Ident  Path
 	Fields []Field
 }
 
 type StructInit struct {
-	Ident  string
+	Ident  Ident
 	Fields []FieldInit
 }
 
 type Field struct {
-	Ident string
+	Ident Ident
 	Type  Type
 }
 
 type FieldInit struct {
-	Ident string
+	Ident Ident
 	Expr  Expr
 }
 
@@ -58,7 +58,7 @@ type If struct {
 }
 
 type Expr interface {
-	CValue() string
+	CValue(ctx Context) string
 }
 
 type ExprMath struct {
@@ -70,13 +70,13 @@ type ExprToken struct {
 }
 
 type Assignment struct {
-	Ident string
+	Ident Ident
 	Expr  Expr
 	Type  Type
 }
 
 type FunctionCall struct {
-	Ident string
+	Ident Path
 	Args  []Expr
 }
 
@@ -112,7 +112,7 @@ type Ident struct {
 }
 
 type Iter struct {
-	Ident string
+	Ident Ident
 	Lower Expr
 	Upper Expr
 	Body  []Instruction
@@ -124,10 +124,20 @@ type Until struct {
 }
 
 type Reassign struct {
-	Ident string
+	Ident Path
 	Expr  Expr
 }
 
 type Break struct{}
 
 type Continue struct{}
+
+type Import struct {
+	Path  string
+	Root  string
+	Ident Ident
+}
+
+type Path struct {
+	Tokens []Ident
+}

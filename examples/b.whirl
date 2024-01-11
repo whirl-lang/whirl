@@ -1,0 +1,3 @@
+proc hello() {
+	printf("Hello, world!\n")
+}

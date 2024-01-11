@@ -14,7 +14,7 @@ func ParseStruct(tokens *lexer.TokenIterator) (codegen.Struct, error) {
 	}
 
 	// get ident
-	ident, err := ParseIdent(tokens)
+	path, err := ParsePath(tokens)
 
 	if err != nil {
 		return codegen.Struct{}, err
@@ -28,8 +28,9 @@ func ParseStruct(tokens *lexer.TokenIterator) (codegen.Struct, error) {
 	}
 
 	structure := codegen.Struct{
-		Ident: ident.Name,
+		Ident: path,
 	}
+
 	next, err := tokens.Peek()
 
 	if err != nil {
@@ -93,5 +94,5 @@ func ParseField(tokens *lexer.TokenIterator) (codegen.Field, error) {
 		return codegen.Field{}, err
 	}
 
-	return codegen.Field{Ident: ident.Name, Type: typ}, nil
+	return codegen.Field{Ident: ident, Type: typ}, nil
 }
