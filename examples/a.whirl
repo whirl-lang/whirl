@@ -3,6 +3,7 @@ import "./b.whirl";
 proc main() :: int {
 	b::hello();
 	b::sum(1, 2);
-
+	let a: bool = false;
+	$printf("%d", true);
 	escape 0;
 }

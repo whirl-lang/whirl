@@ -1,5 +1,7 @@
 # The Whirl Programming Language
 
+[![Test Status](https://github.com/whirl-lang/whirl/workflows/test/badge.svg)](https://github.com/whirl-lang/whirl/actions)
+
 This is the main source code repository for Whirl. It contains the compiler, standard library, and documentation.
 
 ## Quick links

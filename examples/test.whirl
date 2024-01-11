@@ -1,4 +1,14 @@
 proc main() :: int {
-    printf("Hello world!");
+    printf("Iwfefjmuwikdnjuiwqdjnquwdjqnuwijdqwuijdwquidjqwuiodjqwioan");
+    
     escape 0;
+}
+
+proc add(a: int, b: int) :: int {
+    
+    
+    iter i in 1:10 {
+        printf("%d\n", i);
+    }
+    escape a + b;
 }

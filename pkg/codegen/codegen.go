@@ -15,7 +15,7 @@ type Context struct {
 	Transpile func(content []byte, path string, out io.Writer)
 }
 
-func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) {
+func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) error {
 	writer := bufio.NewWriter(out)
 
 	defer writer.Flush()
@@ -24,7 +24,7 @@ func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) {
 		node, err := nodes.Next()
 
 		if err != nil {
-			panic(err)
+			return err
 		}
 
 		if node == nil {
@@ -33,4 +33,6 @@ func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) {
 
 		writer.WriteString(node.CInstruction(ctx))
 	}
+
+	return nil
 }

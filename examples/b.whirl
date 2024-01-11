@@ -5,3 +5,7 @@ proc hello() :: void {
 proc sum(a: int, b: int) :: int {
 	printf("%d + %d = %d", a, b, a + b);
 }
+
+proc s() :: string {
+	escape "hello";
+}
