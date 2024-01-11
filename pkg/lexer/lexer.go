@@ -2,6 +2,7 @@ package lexer
 
 import (
 	"bytes"
+	"errors"
 )
 
 type TokenIterator struct {
@@ -141,6 +142,10 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 	for (iter.Bytes[index] >= 'a' && iter.Bytes[index] <= 'z') || (iter.Bytes[index] >= 'A' && iter.Bytes[index] <= 'Z') || iter.Bytes[index] == '_' {
 		index++
+	}
+
+	if index == 0 {
+		return Token{}, errors.New("unknown symbol found")
 	}
 
 	str := iter.Bytes[:index]
