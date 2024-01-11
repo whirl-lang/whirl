@@ -402,7 +402,6 @@ func ParseArgs(tokens *lexer.TokenIterator) ([]codegen.Argument, error) {
 }
 
 func ParseProcedureCall(tokens *lexer.TokenIterator, path codegen.Path) (codegen.ProcedureCall, error) {
-
 	// get open parens
 	_, err := ExpectToken(tokens, lexer.PARENOPEN)
 
