@@ -37,15 +37,15 @@ func (i Int) CValue(ctx Context) string {
 }
 
 func (b Bool) CType(ctx Context) string {
-	return "bool"
+	return "int"
 }
 
 func (b Bool) CValue(ctx Context) string {
 	if b.Value {
-		return "true"
+		return "1"
 	}
 
-	return "false"
+	return "0"
 }
 
 func (c Char) CType(ctx Context) string {

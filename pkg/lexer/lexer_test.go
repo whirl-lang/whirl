@@ -13,7 +13,7 @@ func TestLexerEmptyMain(t *testing.T) {
 }
 
 func TestLexerVariables(t *testing.T) {
-	err := CheckForErrorsInIterator([]byte("proc main() :: int { let a: int = 5; escape 0; }"))
+	err := CheckForErrorsInIterator([]byte("proc main() :: int { let a: int = 5; let b: bool = true; escape 0; }"))
 
 	if err != nil {
 		t.Fatalf(err.Error())

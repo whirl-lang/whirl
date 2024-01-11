@@ -92,11 +92,11 @@ func (iter *TokenIterator) Next() (Token, error) {
 
 	//Check for booleans
 	if iter.FoundToken([]byte("false"), true) {
-		return Token{BOOLEAN_LIT, "false"}, nil
+		return Token{BOOLEAN_LIT, "0"}, nil
 	}
 
 	if iter.FoundToken([]byte("true"), true) {
-		return Token{BOOLEAN_LIT, "true"}, nil
+		return Token{BOOLEAN_LIT, "1"}, nil
 	}
 
 	//Check for strings
