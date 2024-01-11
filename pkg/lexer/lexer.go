@@ -22,8 +22,21 @@ func (iter *TokenIterator) Peek() (Token, error) {
 
 	return *iter.NextToken, nil
 }
+func SkipWhitespace(iter *TokenIterator) {
+	if len(iter.Bytes) == 0 {
+		return
+	}
 
+	for iter.Bytes[0] == ' ' || iter.Bytes[0] == '\n' || iter.Bytes[0] == '\t' || iter.Bytes[0] == '\r' {
+		iter.Bytes = iter.Bytes[1:]
+
+		if len(iter.Bytes) == 0 {
+			return
+		}
+	}
+}
 func (iter *TokenIterator) Next() (Token, error) {
+
 	if iter.NextToken != nil {
 		token := *iter.NextToken
 		iter.NextToken = nil
@@ -35,12 +48,26 @@ func (iter *TokenIterator) Next() (Token, error) {
 		return Token{EOF, ""}, nil
 	}
 
-	for iter.Bytes[0] == ' ' || iter.Bytes[0] == '\n' || iter.Bytes[0] == '\t' || iter.Bytes[0] == '\r' {
-		iter.Bytes = iter.Bytes[1:]
+	SkipWhitespace(iter)
 
-		if len(iter.Bytes) == 0 {
-			return Token{EOF, ""}, nil
+	if len(iter.Bytes) == 0 {
+		return Token{EOF, ""}, nil
+	}
+
+	if iter.Bytes[0] == '$' {
+		for iter.Bytes[0] != '\n' {
+			iter.Bytes = iter.Bytes[1:]
+
+			if len(iter.Bytes) == 0 {
+				return Token{EOF, ""}, nil
+			}
 		}
+	}
+
+	SkipWhitespace(iter)
+
+	if len(iter.Bytes) == 0 {
+		return Token{EOF, ""}, nil
 	}
 
 	// check for keywords
