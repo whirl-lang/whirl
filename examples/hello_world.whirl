@@ -17,4 +17,3 @@ proc main() :: int {
     fizzbuzz(n);
     escape 0;
 }
-

@@ -1,0 +1,4 @@
+proc main() :: int {
+    printf("Hello world!");
+    escape 0;
+}
