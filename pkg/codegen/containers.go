@@ -133,9 +133,7 @@ type Break struct{}
 type Continue struct{}
 
 type Import struct {
-	Path  string
-	Root  string
-	Ident Ident
+	Path string
 }
 
 type Path struct {

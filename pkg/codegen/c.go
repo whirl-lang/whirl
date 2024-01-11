@@ -3,8 +3,8 @@ package codegen
 import (
 	"bytes"
 	"fmt"
-	"io/fs"
 	"os"
+	"path"
 	"strconv"
 )
 
@@ -69,19 +69,7 @@ func (p Path) CType(ctx Context) string {
 }
 
 func (p Path) CValue(ctx Context) string {
-	var buffer bytes.Buffer
-
-	buffer.WriteString("__whirl_")
-
-	for i, token := range p.Tokens {
-		buffer.WriteString(token.CType(ctx))
-
-		if i != len(p.Tokens)-1 {
-			buffer.WriteString("_")
-		}
-	}
-
-	return buffer.String()
+	return TransformPath(ctx, p)
 }
 
 func (a Array) CType(ctx Context) string {
@@ -127,7 +115,7 @@ func (p Procedure) CInstruction(ctx Context) string {
 	for i, arg := range p.Args {
 		buffer.WriteString(arg.Type.CType(ctx))
 		buffer.WriteString(" ")
-		buffer.WriteString(arg.Ident.CType(ctx))
+		buffer.WriteString(arg.Ident.Name)
 
 		if i != len(p.Args)-1 {
 			buffer.WriteString(", ")
@@ -167,15 +155,14 @@ func (s Struct) CType(ctx Context) string {
 }
 
 func (a Assignment) CInstruction(ctx Context) string {
-
 	switch a.Type.(type) {
 	case Ident:
-		return fmt.Sprintf("struct %s %s = %s;", a.Type.CType(ctx), a.Ident, a.Expr.(Value).CValue(ctx))
+		return fmt.Sprintf("struct %s %s = %s;", a.Type.CType(ctx), a.Ident.Name, a.Expr.(Value).CValue(ctx))
 	case Array:
-		return fmt.Sprintf("%s %s%s = %s;", a.Type.CType(ctx), a.Ident, a.Type.(Array).Brackets(), a.Expr.(Value).CValue(ctx))
+		return fmt.Sprintf("%s %s%s = %s;", a.Type.CType(ctx), a.Ident.Name, a.Type.(Array).Brackets(), a.Expr.(Value).CValue(ctx))
 	}
 
-	return fmt.Sprintf("%s %s = %s;", a.Type.CType(ctx), a.Ident, a.Expr.(Value).CValue(ctx))
+	return fmt.Sprintf("%s %s = %s;", a.Type.CType(ctx), a.Ident.Name, a.Expr.(Value).CValue(ctx))
 }
 
 func (s StructInit) CValue(ctx Context) string {
@@ -270,15 +257,15 @@ func (i Iter) CInstruction(ctx Context) string {
 	var buffer bytes.Buffer
 
 	buffer.WriteString("for (int ")
-	buffer.WriteString(i.Ident.CType(ctx))
+	buffer.WriteString(i.Ident.Name)
 	buffer.WriteString(" = ")
 	buffer.WriteString(i.Lower.CValue(ctx))
 	buffer.WriteString("; ")
-	buffer.WriteString(i.Ident.CType(ctx))
+	buffer.WriteString(i.Ident.Name)
 	buffer.WriteString(" < ")
 	buffer.WriteString(i.Upper.CValue(ctx))
 	buffer.WriteString("; ")
-	buffer.WriteString(i.Ident.CType(ctx))
+	buffer.WriteString(i.Ident.Name)
 	buffer.WriteString("++) { ")
 
 	for _, instruction := range i.Body {
@@ -329,13 +316,15 @@ func (p ProcedureCall) CInstruction(ctx Context) string {
 }
 
 func (i Import) CInstruction(ctx Context) string {
-	c, err := fs.ReadFile(os.DirFS(i.Root), i.Path)
+	c, err := os.ReadFile(path.Join(ctx.Path, i.Path))
 
 	if err != nil {
 		panic(err)
 	}
 
-	// FIXME: relative paths pointing to the same file from different
-	// locations should not generate different namespaces
-	return ctx.Transpile(c, PathToNamespace(i.Path))
+	buf := bytes.NewBufferString("")
+
+	ctx.Transpile(c, path.Join(ctx.Path, i.Path), buf)
+
+	return buf.String()
 }

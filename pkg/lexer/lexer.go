@@ -142,10 +142,11 @@ func (iter *TokenIterator) Next() (Token, error) {
 	for (iter.Bytes[index] >= 'a' && iter.Bytes[index] <= 'z') || (iter.Bytes[index] >= 'A' && iter.Bytes[index] <= 'Z') || iter.Bytes[index] == '_' {
 		index++
 	}
+
 	str := iter.Bytes[:index]
 	iter.Bytes = iter.Bytes[index:]
-	return Token{IDENT, string(str)}, nil
 
+	return Token{IDENT, string(str)}, nil
 }
 
 func (iter *TokenIterator) FoundToken(token []byte, seperation bool) bool {
@@ -246,12 +247,12 @@ var TokensPretty = []string{
 	IMPORT:   "import",
 	AS:       "as",
 
+	LE:  "<=",
+	GE:  ">=",
 	EQ:  "==",
 	NE:  "!=",
 	LT:  "<",
 	GT:  ">",
-	LE:  "<=",
-	GE:  ">=",
 	AND: "&&",
 	OR:  "||",
 	NOT: "!",

@@ -1,3 +1,7 @@
-proc hello() {
-	printf("Hello, world!\n")
+proc hello() :: void {
+	printf("Hello, world!\n");
+}
+
+proc sum(a: int, b: int) :: int {
+	printf("%d + %d = %d", a, b, a + b);
 }

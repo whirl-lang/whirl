@@ -1,7 +1,7 @@
 package pipeline
 
 import (
-	"bytes"
+	"io"
 
 	"github.com/whirl-lang/whirl/pkg/codegen"
 	"github.com/whirl-lang/whirl/pkg/lexer"
@@ -16,14 +16,24 @@ func transpile(content []byte) parser.InstructionIterator {
 }
 
 // Transpiles the given Whirl source code into C source code.
-func TranspileC(content []byte, namespace string) string {
+func transpileC(content []byte, path string, out io.Writer) {
 	nodes := transpile(content)
-	buf := bytes.NewBufferString("")
 
 	codegen.WriteC(codegen.Context{
-		Namespace: namespace,
+		Namespace: codegen.PathToNamespace(path),
+		Path:      path,
 		Transpile: TranspileC,
-	}, &nodes, buf)
+	}, &nodes, out)
+}
 
-	return buf.String()
+func TranspileC(content []byte, path string, out io.Writer) {
+	nodes := transpile(content)
+
+	out.Write([]byte("#include <stdio.h>\n\n"))
+
+	codegen.WriteC(codegen.Context{
+		Namespace: "",
+		Path:      path,
+		Transpile: transpileC,
+	}, &nodes, out)
 }

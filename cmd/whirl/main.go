@@ -2,39 +2,89 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
+	"path"
 
-	"github.com/urfave/cli/v2"
 	"github.com/whirl-lang/whirl/pkg/pipeline"
 )
 
-func main() {
-	app := &cli.App{
-		Name:  "boom",
-		Usage: "make an explosive entrance",
-		Action: func(*cli.Context) error {
-			fmt.Println("boom! I say!")
-			return nil
-		},
-	}
-	app.Run(os.Args)
+type Args struct {
+	args []string
+}
 
+func main() {
 	args := os.Args
 
-	if len(args) != 2 {
-		panic("Invalid number of arguments")
+	if len(args) < 2 {
+		fmt.Println("Usage: whirl <filename> [args]")
+		return
 	}
 
-	filename := args[1]
+	dir, err := os.Getwd()
+
+	if err != nil {
+		panic(err)
+	}
+
+	file, err := os.Create("out.c")
+
+	if err != nil {
+		panic(err)
+	}
+
+	path := path.Join(dir, args[1])
+
+	ParseFile(path, file)
+
+	out := ExecuteFile(path)
+	ParseArgs(Args{args: args}, file)
+
+	fmt.Println(string(out))
+}
+
+func ParseArgs(args Args, file *os.File) {
+	//TODO: Add proper arg parsing and flags
+	deletingFile := true
+
+	if len(args.args) > 2 {
+		for _, arg := range args.args[2:] {
+			switch arg {
+			case "-c":
+				deletingFile = false
+			}
+		}
+	}
+
+	file.Close()
+
+	if deletingFile {
+		err := os.Remove("out.c")
+
+		if err != nil {
+			panic(err)
+		}
+	}
+}
+
+func ExecuteFile(path string) []byte {
+	out, _ := exec.Command("tcc", "-run", "out.c").CombinedOutput()
+
+	return out
+}
+
+func ParseFile(filename string, out io.Writer) {
 	file, err := os.Open(filename)
 
 	if err != nil {
 		panic(err)
 	}
+
 	defer file.Close()
 
 	stat, err := file.Stat()
+
 	if err != nil {
 		panic(err)
 	}
@@ -42,19 +92,5 @@ func main() {
 	bytes := make([]byte, stat.Size())
 	file.Read(bytes)
 
-	file, err = os.Create("out.c")
-
-	if err != nil {
-		panic(err)
-	}
-
-	file.WriteString(pipeline.TranspileC(bytes, ""))
-
-	out, err := exec.Command("tcc", "-run", "out.c").Output()
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println(string(out))
+	pipeline.TranspileC(bytes, path.Dir(filename), out)
 }

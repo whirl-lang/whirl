@@ -22,25 +22,17 @@ func ParseImport(tokens *lexer.TokenIterator) (codegen.Import, error) {
 		return codegen.Import{}, err
 	}
 
-	// get as
-	_, err = ExpectToken(tokens, lexer.AS)
+	// get semi
+	_, err = ExpectToken(tokens, lexer.SEMICOLON)
 
 	if err != nil {
 		return codegen.Import{}, err
 	}
 
-	// get ident
-	ident, err := ParseIdent(tokens)
-
-	if err != nil {
-		return codegen.Import{}, err
-	}
-
-	return codegen.Import{Path: path.Value, Ident: ident}, nil
+	return codegen.Import{Path: path.Value[1 : len(path.Value)-1]}, nil
 }
 
 func ParseBody(tokens *lexer.TokenIterator) ([]codegen.Instruction, error) {
-
 	// parse curly open
 	_, err := ExpectToken(tokens, lexer.CURLYOPEN)
 

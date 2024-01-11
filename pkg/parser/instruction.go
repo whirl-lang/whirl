@@ -181,13 +181,7 @@ func ParseProcedure(tokens *lexer.TokenIterator) (codegen.Procedure, error) {
 	}
 
 	// two colons
-	_, err = ExpectToken(tokens, lexer.COLON)
-
-	if err != nil {
-		return codegen.Procedure{}, err
-	}
-
-	_, err = ExpectToken(tokens, lexer.COLON)
+	_, err = ExpectToken(tokens, lexer.COLONCOLON)
 
 	if err != nil {
 		return codegen.Procedure{}, err
@@ -336,7 +330,6 @@ func ParseIter(tokens *lexer.TokenIterator) (codegen.Iter, error) {
 }
 
 func ParseBreak(tokens *lexer.TokenIterator) (codegen.Break, error) {
-
 	// get "break"
 	_, err := ExpectToken(tokens, lexer.BREAK)
 

@@ -1,7 +1,8 @@
-import "b.whirl" as b;
+import "./b.whirl";
 
 proc main() :: int {
 	b::hello();
+	b::sum(1, 2);
 
 	escape 0;
 }

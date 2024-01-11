@@ -11,7 +11,8 @@ type InstructionIterator interface {
 
 type Context struct {
 	Namespace string
-	Transpile func(content []byte, namespace string) string
+	Path      string
+	Transpile func(content []byte, path string, out io.Writer)
 }
 
 func WriteC(ctx Context, nodes InstructionIterator, out io.Writer) {
