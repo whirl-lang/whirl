@@ -5,12 +5,22 @@ import (
 	"os"
 	"os/exec"
 
+	"github.com/urfave/cli/v2"
 	"github.com/whirl-lang/whirl/pkg/codegen"
 	"github.com/whirl-lang/whirl/pkg/lexer"
 	"github.com/whirl-lang/whirl/pkg/parser"
 )
 
 func main() {
+	app := &cli.App{
+		Name:  "boom",
+		Usage: "make an explosive entrance",
+		Action: func(*cli.Context) error {
+			fmt.Println("boom! I say!")
+			return nil
+		},
+	}
+
 	args := os.Args
 
 	if len(args) != 2 {
@@ -51,5 +61,4 @@ func main() {
 	}
 
 	fmt.Println(string(out))
-
 }
